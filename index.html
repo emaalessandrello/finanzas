@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Finanzas Personales V10.1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); background: var(--color-background-tertiary); color: var(--color-text-primary); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 1rem; }
+        .header h1 { font-size: 28px; font-weight: 500; }
+        .version-info { font-size: 12px; color: var(--color-text-secondary); }
+        .mes-selector { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 1rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md); flex-wrap: wrap; }
+        .mes-info { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+        .mes-dato { display: flex; align-items: center; gap: 0.5rem; font-size: 14px; }
+        .mes-dato label { font-weight: 500; color: var(--color-text-secondary); }
+        .tabs { display: flex; gap: 0; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 2rem; overflow-x: auto; }
+        .tab { padding: 12px 16px; cursor: pointer; border: none; background: none; font-size: 14px; font-weight: 500; color: var(--color-text-secondary); border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .metric-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; text-align: center; }
+        .metric-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; margin-bottom: 0.5rem; }
+        .metric-value { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 0.5rem; color: var(--color-text-primary); }
+        input, select, textarea { width: 100%; padding: 0.75rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-family: inherit; font-size: 14px; background: var(--color-background-primary); color: var(--color-text-primary); }
+        input:focus, select:focus { outline: none; border-color: var(--color-border-primary); }
+        button { padding: 0.75rem 1.5rem; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        button:hover { background: var(--color-background-secondary); }
+        .table-container { overflow-x: auto; max-height: 600px; overflow-y: auto; }
+        table { width: 100%; font-size: 12px; border-collapse: collapse; }
+        th { background: var(--color-background-secondary); padding: 0.75rem; text-align: left; font-weight: 500; border-bottom: 0.5px solid var(--color-border-tertiary); position: sticky; top: 0; }
+        td { padding: 0.75rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+        tr:hover { background: var(--color-background-secondary); }
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: var(--border-radius-md); font-size: 10px; font-weight: 500; }
+        .badge-fijo { background: rgba(55, 138, 221, 0.15); color: #185FA5; }
+        .badge-variable { background: rgba(227, 75, 74, 0.15); color: #A32D2D; }
+        .chart-container { position: relative; width: 100%; height: 300px; margin: 1.5rem 0; }
+        .success { color: #639922; background: rgba(99, 153, 34, 0.1); padding: 1rem; border-radius: var(--border-radius-md); margin-bottom: 1rem; }
+        .info-box { background: rgba(55, 138, 221, 0.1); padding: 1rem; border-radius: var(--border-radius-md); margin-bottom: 1rem; color: var(--color-text-primary); font-size: 14px; }
+        .pending-items { background: rgba(186, 117, 23, 0.1); padding: 1rem; border-radius: var(--border-radius-md); margin-bottom: 1rem; border-left: 4px solid #BA7517; }
+        .botones-accion { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .botones-accion button { padding: 0.75rem 1rem; }
+        .btn-success { background: #639922; color: white; font-weight: 600; border: none; }
+        .btn-success:hover { background: #4a7319; }
+        .btn-warning { background: rgba(186, 117, 23, 0.2); color: #854F0B; }
+        .btn-danger { background: rgba(227, 75, 74, 0.2); color: #A32D2D; }
+        .btn-info { background: rgba(55, 138, 221, 0.2); color: #185FA5; }
+        select.inline-select { width: auto; padding: 0.4rem; font-size: 11px; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>💰 Finanzas Personal</h1>
+                <span class="version-info">V10.1 - GitHub Pages</span>
+            </div>
+            <div class="botones-accion">
+                <button class="btn-info" onclick="exportarHistoricoCSV()">📊 Histórico</button>
+                <button onclick="exportarMesActual()">⬇ Exportar</button>
+            </div>
+        </div>
+
+        <div class="mes-selector">
+            <div class="mes-info">
+                <div class="mes-dato">
+                    <label>Mes:</label>
+                    <input type="month" id="mesActual" onchange="cambiarMes()" style="max-width: 150px;">
+                </div>
+                <div class="mes-dato">
+                    <label>Meses guardados:</label>
+                    <select id="mesesGuardados" onchange="cargarMes()" style="max-width: 150px;"></select>
+                </div>
+            </div>
+            <div class="botones-accion">
+                <button class="btn-warning" onclick="confirmarNuevoMes()">📅 Nuevo Mes</button>
+                <button class="btn-danger" onclick="confirmarLimpiarMes()">🗑️ Limpiar</button>
+            </div>
+        </div>
+
+        <div id="pendientesMsg" class="pending-items" style="display: none;">
+            <strong>⏳ CAMBIOS SIN GUARDAR</strong><br>
+            <button class="btn-success" onclick="guardarMes()">✓ GUARDAR AHORA</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="cambiarTab('dashboard')">Dashboard</button>
+            <button class="tab" onclick="cambiarTab('ingresos')">Ingresos</button>
+            <button class="tab" onclick="cambiarTab('mercado')">Mercado Pago</button>
+            <button class="tab" onclick="cambiarTab('tarjeta')">Tarjeta</button>
+            <button class="tab" onclick="cambiarTab('efectivo')">Efectivo</button>
+            <button class="tab" onclick="cambiarTab('presupuestos')">Presupuestos</button>
+            <button class="tab" onclick="cambiarTab('reportes')">Reportes</button>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="tab-content active">
+            <div class="botones-accion">
+                <button class="btn-success" onclick="guardarMes()">✓ GUARDAR MES ACTUAL</button>
+                <button onclick="actualizarVistas()">🔄 Refrescar</button>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Ingresos</div>
+                    <div class="metric-value" style="color: #639922;">$<span id="ingresoTotal">0</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Gastos</div>
+                    <div class="metric-value" style="color: #A32D2D;">$<span id="gastoTotal">0</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Saldo</div>
+                    <div class="metric-value" id="saldoNeto">$0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Fijos</div>
+                    <div class="metric-value" style="color: #185FA5;">$<span id="gastoFijo">0</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Variables</div>
+                    <div class="metric-value" style="color: #A32D2D;">$<span id="gastoVariable">0</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="font-size: 16px; margin-bottom: 1rem;">Últimas Transacciones</h2>
+                <div class="table-container">
+                    <table id="ultimasTransacciones">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th>Subcategoría</th>
+                                <th>Monto</th>
+                                <th>Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- INGRESOS -->
+        <div id="ingresos" class="tab-content">
+            <div class="card">
+                <h2 style="font-size: 18px; margin-bottom: 1rem;">Registrar Ingresos</h2>
+                <div class="two-col">
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 1rem;">WITRALEN</h3>
+                        <div class="form-group">
+                            <label>Mes</label>
+                            <input type="month" id="mesWitralen">
+                        </div>
+                        <div class="form-group">
+                            <label>Monto ($)</label>
+                            <input type="number" id="montoWitralen" value="3000000" step="100000">
+                        </div>
+                        <button onclick="agregarIngresoWitralen()" style="background: #639922; color: white;">+ Agregar</button>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 1rem;">CERÁMICA CONECTA</h3>
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="date" id="fechaCeramica">
+                        </div>
+                        <div class="form-group">
+                            <label>Monto ($)</label>
+                            <input type="number" id="montoCeramica" step="1000">
+                        </div>
+                        <button onclick="agregarIngresoCeramica()" style="background: #639922; color: white;">+ Agregar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MERCADO PAGO -->
+        <div id="mercado" class="tab-content">
+            <div class="card">
+                <h2 style="font-size: 18px; margin-bottom: 1rem;">Importar CSV Mercado Pago</h2>
+                <div class="info-box">📋 Sube CSV y edita categoría/subcategoría/tipo si necesitas</div>
+                <div class="form-group">
+                    <label>Cargar archivo CSV</label>
+                    <input type="file" id="archivoMP" accept=".csv" onchange="procesarMP()">
+                </div>
+                <div id="estadoMP"></div>
+                <div class="table-container" id="tablaMPContainer" style="display: none;">
+                    <table id="tablaMercadoPago">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Monto</th>
+                                <th>Categoría</th>
+                                <th>Subcategoría</th>
+                                <th>Tipo</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARJETA -->
+        <div id="tarjeta" class="tab-content">
+            <div class="card">
+                <h2 style="font-size: 18px; margin-bottom: 1rem;">Importar CSV Tarjeta</h2>
+                <div class="info-box">📋 Sube CSV y edita categoría/subcategoría/tipo si necesitas</div>
+                <div class="form-group">
+                    <label>Cargar archivo CSV</label>
+                    <input type="file" id="archivoTarjeta" accept=".csv" onchange="procesarTarjetaCSV()">
+                </div>
+                <div id="estadoTarjeta"></div>
+                <div class="table-container" id="tablaTarjetaCSVContainer" style="display: none;">
+                    <table id="tablaTarjetaCSV">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Monto</th>
+                                <th>Categoría</th>
+                                <th>Subcategoría</th>
+                                <th>Tipo</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- EFECTIVO -->
+        <div id="efectivo" class="tab-content">
+            <div class="card">
+                <h2 style="font-size: 18px; margin-bottom: 1rem;">Agregar Gasto Efectivo</h2>
+                <div class="two-col">
+                    <div>
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="date" id="fechaEfectivo">
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <input type="text" id="descEfectivo">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Monto ($)</label>
+                            <input type="number" id="montoEfectivo" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select id="categoriaEfectivo"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Subcategoría</label>
+                    <select id="subcategoriaEfectivo"></select>
+                </div>
+                <button onclick="agregarGastoEfectivo()" style="background: #639922; color: white;">+ Agregar</button>
+            </div>
+        </div>
+
+        <!-- PRESUPUESTOS -->
+        <div id="presupuestos" class="tab-content">
+            <div class="card">
+                <h2 style="font-size: 18px; margin-bottom: 1rem;">Presupuestos Mensuales</h2>
+                <div id="presupuestosForm"></div>
+            </div>
+        </div>
+
+        <!-- REPORTES -->
+        <div id="reportes" class="tab-content">
+            <div class="card">
+                <h2 style="font-size: 18px; margin-bottom: 1rem;">Filtros</h2>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <input type="month" id="filtroMes" onchange="actualizarReportes()" style="max-width: 150px;">
+                    <select id="filtroCategoria" onchange="actualizarReportes()" style="max-width: 150px;"></select>
+                    <input type="text" id="filtroBusqueda" placeholder="Buscar..." onchange="actualizarReportes()" style="max-width: 200px;">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="font-size: 16px; margin-bottom: 1rem;">Top 10 Gastos</h2>
+                <div id="topGastos"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <script>
+        const VERSION = 'v10.1';
+        const CATEGORIAS = ['Pareja / Vuelos', 'Vivienda', 'Servicios', 'Movilidad', 'Combustible', 'Compromisos', 'Salud y Bienestar', 'Indumentaria', 'Seguridad', 'Alimentos y Bebidas', 'Comidas y Bebidas Afuera', 'Entretenimiento', 'Vehículo', 'Mascotas', 'Regalos', 'Varios'];
+
+        const SUBCATEGORIAS = {
+            'Pareja / Vuelos': ['Vuelos', 'Actividades/Tours', 'Restaurantes viaje', 'Otros viaje'],
+            'Vivienda': ['Alquiler', 'Expensas', 'Servicios del hogar', 'Decoración/Muebles', 'Limpieza'],
+            'Servicios': ['Internet/WiFi', 'Gas', 'Luz', 'Otros servicios'],
+            'Movilidad': ['Uber/Cabify', 'Transporte público', 'Estacionamiento', 'Otros viajes'],
+            'Combustible': ['YPF/Shell/Axion', 'Estación de servicio'],
+            'Compromisos': ['Cuota alimentaria', 'Obligaciones familia', 'Otros compromisos'],
+            'Salud y Bienestar': ['Obra social', 'Farmacia', 'Médico/Consultas', 'Gimnasio', 'Deportes', 'Otros salud'],
+            'Indumentaria': ['Ropa', 'Calzado', 'Accesorios', 'Otros prendas'],
+            'Seguridad': ['Alarma casa', 'Seguro casa', 'Otros seguros'],
+            'Alimentos y Bebidas': ['Supermercado', 'Verdulería', 'Almacén', 'Bebidas/Licorería', 'Otros alimentos'],
+            'Comidas y Bebidas Afuera': ['Restaurante', 'Café', 'Delivery', 'Snack/Comida rápida', 'Bar/Pub', 'Otros comidas afuera'],
+            'Entretenimiento': ['Cine', 'Eventos/Conciertos', 'Hobbies', 'Otros entretenimiento'],
+            'Vehículo': ['Cuota auto', 'Seguro auto', 'Mantenimiento', 'Reparaciones/Repuestos', 'Patente', 'Otros vehículo'],
+            'Mascotas': ['Alimento', 'Veterinario', 'Otros mascotas'],
+            'Regalos': ['Regalos'],
+            'Varios': ['Sin clasificar', 'Donativos', 'Otros gastos']
+        };
+
+        const TIPO_GASTO = {
+            'Pareja / Vuelos': 'Variable', 'Vivienda': 'Fijo', 'Servicios': 'Fijo', 'Movilidad': 'Variable',
+            'Combustible': 'Fijo', 'Compromisos': 'Fijo', 'Salud y Bienestar': 'Fijo', 'Indumentaria': 'Variable',
+            'Seguridad': 'Fijo', 'Alimentos y Bebidas': 'Variable', 'Comidas y Bebidas Afuera': 'Variable',
+            'Entretenimiento': 'Fijo', 'Vehículo': 'Fijo', 'Mascotas': 'Fijo', 'Regalos': 'Variable', 'Varios': 'Variable'
+        };
+
+        const REGLAS_CLASIFICACION = {
+            'Pareja / Vuelos': { palabras: ['FLYBONDI', 'JETSMART', 'LATAM', 'AEROLÍNEAS'], subcategoria: 'Vuelos' },
+            'Salud y Bienestar': { palabras: ['OMINT', 'LEVEL GYM', 'FARMAEXPRESS', 'FARMACIA'], subcategoria: 'Farmacia' },
+            'Vivienda': { palabras: ['VANESA ELVIRA', 'DLO*ABRAZAS', 'CRISTINA GABRIELA AHUMADA'], subcategoria: 'Limpieza' },
+            'Alimentos y Bebidas': { palabras: ['CARREFOUR', 'WALMART', 'GRANJA BENEDETTI', 'EL VECINO', 'LUIS HUMBERTO PIPISTRELLI', 'LUCAS MATIAS QUISPE'], subcategoria: 'Supermercado' },
+            'Vehículo': { palabras: ['SHELL', 'AXION', 'YPF', 'SHELLBOX', 'EST DE SERV BONANNO', 'SUR FRANCE', 'ALDO JAVIER SANTILLAN', 'RUMBO SUR'], subcategoria: 'YPF/Shell/Axion' },
+            'Compromisos': { palabras: ['PALOMA CARRETERO'], subcategoria: 'Cuota alimentaria' },
+        };
+
+        const GASTOS_EXCLUIR = ['SPOTIFY QD6FDJ2Q', 'GOOGLE *YouTubeP', 'DIGITALOCEAN.COM', 'MERPAGO*MELI'];
+        const DIVISIONES = { 'OMINT': 3 };
+
+        let mesActual = new Date().toISOString().split('T')[0].substring(0, 7);
+        let datosGuardados = {};
+        let datosActuales = {};
+        let sinGuardar = false;
+
+        function obtenerEstructuraDatos() {
+            return { mercadopago: [], tarjeta: [], efectivo: [], ingresos: [], presupuestos: {} };
+        }
+
+        function migrarDatos() {
+            const datosViejos = localStorage.getItem('finanzas_datos_v10') || localStorage.getItem('finanzas_datos_v9') || localStorage.getItem('finanzas_datos_v8');
+            if (datosViejos) {
+                datosGuardados = JSON.parse(datosViejos);
+                localStorage.setItem(`finanzas_datos_${VERSION}`, JSON.stringify(datosGuardados));
+                localStorage.removeItem('finanzas_datos_v10');
+                localStorage.removeItem('finanzas_datos_v9');
+                localStorage.removeItem('finanzas_datos_v8');
+            }
+        }
+
+        function cargarDatos() {
+            migrarDatos();
+            const guardados = localStorage.getItem(`finanzas_datos_${VERSION}`);
+            if (guardados) datosGuardados = JSON.parse(guardados);
+            document.getElementById('mesActual').value = mesActual;
+            actualizarSelectMeses();
+            cargarMes();
+            poblarSelects();
+            inicializarPresupuestos();
+        }
+
+        function actualizarSelectMeses() {
+            const select = document.getElementById('mesesGuardados');
+            const meses = Object.keys(datosGuardados).sort().reverse();
+            select.innerHTML = '<option value="">-- Cargar mes anterior --</option>' + meses.map(mes => `<option value="${mes}">${mes}</option>`).join('');
+        }
+
+        function cargarMes() {
+            const mesSeleccionado = document.getElementById('mesesGuardados').value;
+            if (mesSeleccionado) {
+                datosActuales = JSON.parse(JSON.stringify(datosGuardados[mesSeleccionado]));
+                mesActual = mesSeleccionado;
+                document.getElementById('mesActual').value = mesActual;
+            } else if (!datosActuales.mercadopago) {
+                datosActuales = obtenerEstructuraDatos();
+            }
+            sinGuardar = false;
+            mostrarEstadoPendiente();
+            actualizarVistas();
+        }
+
+        function cambiarMes() {
+            const nuevoMes = document.getElementById('mesActual').value;
+            if (!nuevoMes) return;
+            if (sinGuardar && !confirm('¿Descartar cambios?')) {
+                document.getElementById('mesActual').value = mesActual;
+                return;
+            }
+            mesActual = nuevoMes;
+            datosActuales = datosGuardados[mesActual] ? JSON.parse(JSON.stringify(datosGuardados[mesActual])) : obtenerEstructuraDatos();
+            sinGuardar = false;
+            mostrarEstadoPendiente();
+            actualizarVistas();
+        }
+
+        function guardarMes() {
+            datosGuardados[mesActual] = JSON.parse(JSON.stringify(datosActuales));
+            localStorage.setItem(`finanzas_datos_${VERSION}`, JSON.stringify(datosGuardados));
+            sinGuardar = false;
+            mostrarEstadoPendiente();
+            actualizarSelectMeses();
+            alert(`✓ Mes ${mesActual} guardado`);
+        }
+
+        function confirmarNuevoMes() {
+            if (sinGuardar && !confirm('¿Guardar cambios antes?')) return;
+            if (sinGuardar) guardarMes();
+            const hoy = new Date();
+            hoy.setMonth(hoy.getMonth() + 1);
+            mesActual = hoy.toISOString().split('T')[0].substring(0, 7);
+            datosActuales = obtenerEstructuraDatos();
+            document.getElementById('mesActual').value = mesActual;
+            sinGuardar = false;
+            mostrarEstadoPendiente();
+            actualizarVistas();
+        }
+
+        function confirmarLimpiarMes() {
+            if (!confirm(`¿Limpiar datos de ${mesActual}?`)) return;
+            datosActuales = obtenerEstructuraDatos();
+            sinGuardar = true;
+            mostrarEstadoPendiente();
+            actualizarVistas();
+        }
+
+        function mostrarEstadoPendiente() {
+            document.getElementById('pendientesMsg').style.display = sinGuardar ? 'block' : 'none';
+        }
+
+        function parsearMontoArgentino(montoStr) {
+            if (!montoStr) return 0;
+            const limpiar = montoStr.toString().trim().replace(/\./g, '').replace(',', '.');
+            return parseFloat(limpiar) || 0;
+        }
+
+        function poblarSelects() {
+            const selects = document.querySelectorAll('select[id$="Efectivo"]');
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">Seleccionar...</option>' + CATEGORIAS.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            });
+            document.getElementById('categoriaEfectivo').addEventListener('change', function() {
+                document.getElementById('subcategoriaEfectivo').innerHTML = (SUBCATEGORIAS[this.value] || []).map(sub => `<option value="${sub}">${sub}</option>`).join('');
+            });
+            const filtroCategoria = document.getElementById('filtroCategoria');
+            filtroCategoria.innerHTML = '<option value="">Todas</option>' + CATEGORIAS.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
+
+        function inicializarPresupuestos() {
+            if (!datosActuales.presupuestos) datosActuales.presupuestos = {};
+            const form = document.getElementById('presupuestosForm');
+            form.innerHTML = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">' + 
+                CATEGORIAS.map(cat => `
+                    <div style="background: var(--color-background-secondary); padding: 1rem; border-radius: var(--border-radius-md);">
+                        <label style="font-size: 13px;">${cat}</label>
+                        <input type="number" value="${datosActuales.presupuestos[cat] || 0}" step="100" placeholder="$0" 
+                            onchange="datosActuales.presupuestos['${cat}'] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" 
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                `).join('') + '</div>';
+        }
+
+        function procesarMP() {
+            const archivo = document.getElementById('archivoMP').files[0];
+            if (!archivo) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lineas = csv.split('\n');
+                let gastosMP = [];
+                for (let i = 4; i < lineas.length; i++) {
+                    const linea = lineas[i].trim();
+                    if (!linea) continue;
+                    const partes = linea.split(';');
+                    if (partes.length < 5) continue;
+                    const fecha = partes[0].trim();
+                    const descripcion = partes[1].trim();
+                    const monto = parsearMontoArgentino(partes[3].trim());
+                    if (monto >= 0 || isNaN(monto)) continue;
+                    if (descripcion.includes('Rendimiento') || descripcion.includes('Transferencia recibida')) continue;
+                    const montoAbs = Math.abs(monto);
+                    const clasificacion = clasificarGasto(descripcion);
+                    const division = DIVISIONES[descripcion.toUpperCase()] || 1;
+                    const montoRegistrar = montoAbs / division;
+                    gastosMP.push({
+                        fecha: fecha,
+                        descripcion: descripcion,
+                        monto: montoAbs,
+                        montoRegistrar: montoRegistrar,
+                        categoria: clasificacion.categoria,
+                        subcategoria: clasificacion.subcategoria,
+                        tipo: clasificacion.categoria !== 'EMPRESA' ? TIPO_GASTO[clasificacion.categoria] : 'EMPRESA',
+                        excluir: clasificacion.excluir,
+                        origen: 'mercadopago'
+                    });
+                }
+                datosActuales.mercadopago = gastosMP;
+                sinGuardar = true;
+                mostrarEstadoPendiente();
+                mostrarTablaMP();
+                actualizarVistas();
+                document.getElementById('estadoMP').innerHTML = `<div class="success">✓ ${gastosMP.length} gastos importados</div>`;
+            };
+            reader.readAsText(archivo);
+        }
+
+        function mostrarTablaMP() {
+            const tbody = document.querySelector('#tablaMercadoPago tbody');
+            tbody.innerHTML = '';
+            document.getElementById('tablaMPContainer').style.display = 'block';
+            datosActuales.mercadopago.forEach((gasto, idx) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${gasto.fecha}</td>
+                    <td style="max-width: 100px; overflow: hidden;">${gasto.descripcion}</td>
+                    <td>$${gasto.montoRegistrar.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                    <td><select class="inline-select" onchange="datosActuales.mercadopago[${idx}].categoria = this.value; sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaMP();">
+                        ${CATEGORIAS.map(cat => `<option ${cat === gasto.categoria ? 'selected' : ''} value="${cat}">${cat}</option>`).join('')}
+                    </select></td>
+                    <td><select class="inline-select" onchange="datosActuales.mercadopago[${idx}].subcategoria = this.value; sinGuardar = true; mostrarEstadoPendiente();">
+                        ${(SUBCATEGORIAS[gasto.categoria] || []).map(sub => `<option ${sub === gasto.subcategoria ? 'selected' : ''} value="${sub}">${sub}</option>`).join('')}
+                    </select></td>
+                    <td><select class="inline-select" onchange="datosActuales.mercadopago[${idx}].tipo = this.value; sinGuardar = true; mostrarEstadoPendiente();">
+                        <option ${gasto.tipo === 'Fijo' ? 'selected' : ''} value="Fijo">Fijo</option>
+                        <option ${gasto.tipo === 'Variable' ? 'selected' : ''} value="Variable">Variable</option>
+                    </select></td>
+                    <td><button onclick="datosActuales.mercadopago.splice(${idx}, 1); sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaMP();" style="color: #A32D2D; padding: 0.2rem 0.4rem; font-size: 11px;">✕</button></td>
+                `;
+            });
+        }
+
+        function procesarTarjetaCSV() {
+            const archivo = document.getElementById('archivoTarjeta').files[0];
+            if (!archivo) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lineas = csv.split('\n');
+                let gastosTarjeta = [];
+                for (let i = 1; i < lineas.length; i++) {
+                    const linea = lineas[i].trim();
+                    if (!linea) continue;
+                    const partes = linea.split(';');
+                    if (partes.length < 9) continue;
+                    const fecha = partes[0].trim();
+                    const descripcion = partes[1].trim();
+                    const montoReg = parsearMontoArgentino(partes[3].trim());
+                    const categoria = partes[4].trim();
+                    const subcategoria = partes[5].trim();
+                    const tipo = partes[6].trim();
+                    const excluir = partes[8].trim() === 'SI';
+                    gastosTarjeta.push({ fecha, descripcion, monto: montoReg, montoRegistrar: montoReg, categoria, subcategoria, tipo, excluir, origen: 'tarjeta' });
+                }
+                datosActuales.tarjeta = [...datosActuales.tarjeta, ...gastosTarjeta];
+                sinGuardar = true;
+                mostrarEstadoPendiente();
+                mostrarTablaTarjeta();
+                actualizarVistas();
+                document.getElementById('estadoTarjeta').innerHTML = `<div class="success">✓ ${gastosTarjeta.length} gastos cargados</div>`;
+            };
+            reader.readAsText(archivo);
+        }
+
+        function mostrarTablaTarjeta() {
+            const tbody = document.querySelector('#tablaTarjetaCSV tbody');
+            tbody.innerHTML = '';
+            document.getElementById('tablaTarjetaCSVContainer').style.display = 'block';
+            datosActuales.tarjeta.forEach((gasto, idx) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${gasto.fecha}</td>
+                    <td style="max-width: 80px; overflow: hidden;">${gasto.descripcion}</td>
+                    <td>$${gasto.montoRegistrar.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                    <td><select class="inline-select" onchange="datosActuales.tarjeta[${idx}].categoria = this.value; sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaTarjeta();">
+                        ${CATEGORIAS.map(cat => `<option ${cat === gasto.categoria ? 'selected' : ''} value="${cat}">${cat}</option>`).join('')}
+                    </select></td>
+                    <td><select class="inline-select" onchange="datosActuales.tarjeta[${idx}].subcategoria = this.value; sinGuardar = true; mostrarEstadoPendiente();">
+                        ${(SUBCATEGORIAS[gasto.categoria] || []).map(sub => `<option ${sub === gasto.subcategoria ? 'selected' : ''} value="${sub}">${sub}</option>`).join('')}
+                    </select></td>
+                    <td><select class="inline-select" onchange="datosActuales.tarjeta[${idx}].tipo = this.value; sinGuardar = true; mostrarEstadoPendiente();">
+                        <option ${gasto.tipo === 'Fijo' ? 'selected' : ''} value="Fijo">Fijo</option>
+                        <option ${gasto.tipo === 'Variable' ? 'selected' : ''} value="Variable">Variable</option>
+                    </select></td>
+                    <td><button onclick="datosActuales.tarjeta.splice(${idx}, 1); sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaTarjeta();" style="color: #A32D2D; padding: 0.2rem 0.4rem; font-size: 11px;">✕</button></td>
+                `;
+            });
+        }
+
+        function agregarIngresoCeramica() {
+            const fecha = document.getElementById('fechaCeramica').value;
+            const monto = parseFloat(document.getElementById('montoCeramica').value);
+            if (!fecha || !monto) { alert('Completa campos'); return; }
+            datosActuales.ingresos.push({ fecha, descripcion: 'CERÁMICA CONECTA - Venta', monto, tipo: 'Variable', origen: 'ceramica' });
+            sinGuardar = true;
+            mostrarEstadoPendiente();
+            actualizarVistas();
+            document.getElementById('fechaCeramica').value = '';
+            document.getElementById('montoCeramica').value = '';
+        }
+
+        function agregarIngresoWitralen() {
+            const mes = document.getElementById('mesWitralen').value;
+            const monto = parseFloat(document.getElementById('montoWitralen').value);
+            if (!mes || !monto) { alert('Completa campos'); return; }
+            datosActuales.ingresos.push({ fecha: mes + '-01', descripcion: 'WITRALEN - Sueldo', monto, tipo: 'Fijo', origen: 'witralen' });
+            sinGuardar = true;
+            mostrarEstadoPendiente();
+            actualizarVistas();
+        }
+
+        function agregarGastoEfectivo() {
+            const fecha = document.getElementById('fechaEfectivo').value;
+            const desc = document.getElementById('descEfectivo').value;
+            const monto = parseFloat(document.getElementById('montoEfectivo').value);
+            const categoria = document.getElementById('categoriaEfectivo').value;
+            const subcategoria = document.getElementById('subcategoriaEfectivo').value;
+            if (!fecha || !desc || !monto || !categoria) { alert('Completa campos'); return; }
+            datosActuales.efectivo.push({ fecha, descripcion: desc, monto, categoria, subcategoria, tipo: TIPO_GASTO[categoria], excluir: false, origen: 'efectivo' });
+            sinGuardar = true;
+            mostrarEstadoPendiente();
+            actualizarVistas();
+            document.getElementById('fechaEfectivo').value = '';
+            document.getElementById('descEfectivo').value = '';
+            document.getElementById('montoEfectivo').value = '';
+        }
+
+        function clasificarGasto(descripcion) {
+            const desc = descripcion.toUpperCase();
+            for (const palabra of GASTOS_EXCLUIR) if (desc.includes(palabra)) return { categoria: 'EMPRESA', subcategoria: '', excluir: true };
+            for (const [categoria, regla] of Object.entries(REGLAS_CLASIFICACION)) {
+                for (const palabra of regla.palabras) {
+                    if (desc.includes(palabra)) return { categoria: categoria, subcategoria: regla.subcategoria, excluir: false };
+                }
+            }
+            return { categoria: 'Varios', subcategoria: 'Sin clasificar', excluir: false };
+        }
+
+        function cambiarTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function actualizarVistas() {
+            actualizarMetricas();
+            actualizarUltimas();
+            actualizarReportes();
+        }
+
+        function actualizarMetricas() {
+            const todos = [...datosActuales.mercadopago, ...datosActuales.tarjeta, ...datosActuales.efectivo];
+            const conEmpresa = todos.filter(g => !g.excluir);
+            const totalIngresos = datosActuales.ingresos.reduce((s, g) => s + g.monto, 0);
+            const totalFijo = conEmpresa.filter(g => g.tipo === 'Fijo').reduce((s, g) => s + (g.montoRegistrar || g.monto), 0);
+            const totalVariable = conEmpresa.filter(g => g.tipo === 'Variable').reduce((s, g) => s + (g.montoRegistrar || g.monto), 0);
+            const totalGastos = totalFijo + totalVariable;
+            const saldoNeto = totalIngresos - totalGastos;
+            document.getElementById('ingresoTotal').textContent = totalIngresos.toLocaleString('es-AR', {maximumFractionDigits: 0});
+            document.getElementById('gastoTotal').textContent = totalGastos.toLocaleString('es-AR', {maximumFractionDigits: 0});
+            document.getElementById('saldoNeto').textContent = '$' + saldoNeto.toLocaleString('es-AR', {maximumFractionDigits: 0});
+            document.getElementById('saldoNeto').style.color = saldoNeto >= 0 ? '#639922' : '#A32D2D';
+            document.getElementById('gastoFijo').textContent = totalFijo.toLocaleString('es-AR', {maximumFractionDigits: 0});
+            document.getElementById('gastoVariable').textContent = totalVariable.toLocaleString('es-AR', {maximumFractionDigits: 0});
+        }
+
+        function actualizarUltimas() {
+            const conEmpresa = [...datosActuales.mercadopago, ...datosActuales.tarjeta, ...datosActuales.efectivo].filter(g => !g.excluir)
+                .sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).slice(0, 10);
+            const tbody = document.querySelector('#ultimasTransacciones tbody');
+            tbody.innerHTML = '';
+            conEmpresa.forEach(t => {
+                const row = tbody.insertRow();
+                const monto = t.montoRegistrar || t.monto;
+                row.innerHTML = `
+                    <td>${t.fecha}</td>
+                    <td style="max-width: 100px; overflow: hidden;">${t.descripcion}</td>
+                    <td>${t.categoria}</td>
+                    <td>${t.subcategoria}</td>
+                    <td>$${monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                    <td><span class="badge ${t.tipo === 'Fijo' ? 'badge-fijo' : 'badge-variable'}">${t.tipo}</span></td>
+                `;
+            });
+        }
+
+        function actualizarReportes() {
+            const filtroCategoria = document.getElementById('filtroCategoria').value;
+            const filtroBusqueda = document.getElementById('filtroBusqueda').value.toUpperCase();
+            let todos = [...datosActuales.mercadopago, ...datosActuales.tarjeta, ...datosActuales.efectivo];
+            todos = todos.filter(g => !g.excluir);
+            if (filtroCategoria) todos = todos.filter(g => g.categoria === filtroCategoria);
+            if (filtroBusqueda) todos = todos.filter(g => g.descripcion.toUpperCase().includes(filtroBusqueda));
+            const topGastos = todos.sort((a, b) => (b.montoRegistrar || b.monto) - (a.montoRegistrar || a.monto)).slice(0, 10);
+            const topHTML = topGastos.map(g => {
+                const monto = g.montoRegistrar || g.monto;
+                return `<div style="display: flex; justify-content: space-between; padding: 0.75rem; border-bottom: 0.5px solid var(--color-border-tertiary);"><div><div style="font-weight: 500; font-size: 12px;">${g.descripcion}</div><div style="font-size: 10px; color: var(--color-text-secondary);">${g.categoria} • ${g.subcategoria}</div></div><div style="font-weight: 500;">$${monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div></div>`;
+            }).join('');
+            document.getElementById('topGastos').innerHTML = topHTML;
+        }
+
+        function exportarMesActual() {
+            const todos = [...datosActuales.mercadopago, ...datosActuales.tarjeta, ...datosActuales.efectivo];
+            let csv = 'Fecha,Descripcion,Monto,Categoria,Subcategoria,Tipo,Origen\n';
+            todos.forEach(g => {
+                const monto = g.montoRegistrar || g.monto;
+                csv += `${g.fecha},"${g.descripcion}",${monto},${g.categoria},${g.subcategoria},${g.tipo},${g.origen}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `finanzas_${mesActual}.csv`);
+            link.click();
+        }
+
+        function exportarHistoricoCSV() {
+            let csvCompleto = 'Mes,Fecha,Descripcion,Monto,Categoria,Subcategoria,Tipo,Origen\n';
+            for (const [mes, datos] of Object.entries(datosGuardados)) {
+                const todos = [...datos.mercadopago, ...datos.tarjeta, ...datos.efectivo];
+                todos.forEach(g => {
+                    const monto = g.montoRegistrar || g.monto;
+                    csvCompleto += `${mes},${g.fecha},"${g.descripcion}",${monto},${g.categoria},${g.subcategoria},${g.tipo},${g.origen}\n`;
+                });
+            }
+            const blob = new Blob([csvCompleto], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `finanzas_historico_${new Date().toISOString().split('T')[0]}.csv`);
+            link.click();
+        }
+
+        document.getElementById('fechaEfectivo').valueAsDate = new Date();
+        document.getElementById('fechaCeramica').valueAsDate = new Date();
+        document.getElementById('mesWitralen').value = new Date().toISOString().split('T')[0].substring(0, 7);
+        document.getElementById('filtroMes').value = mesActual;
+        cargarDatos();
+    </script>
+</body>
+</html>
