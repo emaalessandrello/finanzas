@@ -462,6 +462,8 @@
                 </div>
             </div>
 
+            <div id="resumen-origen" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;"></div>
+
             <div class="card">
                 <h2 style="font-size: 18px; margin-bottom: 1.5rem; color: var(--text-primary);">Últimas Transacciones</h2>
                 <div class="table-container">
@@ -511,6 +513,24 @@
                         </div>
                         <button onclick="agregarIngresoCeramica()" class="btn-success">+ Agregar</button>
                     </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Ingresos Registrados</h2>
+                <div class="table-container">
+                    <table id="tablaIngresos">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Tipo</th>
+                                <th>Monto</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -667,9 +687,9 @@
         const REGLAS_CLASIFICACION = {
             'Pareja / Vuelos': { palabras: ['FLYBONDI', 'JETSMART', 'LATAM', 'AEROLÍNEAS'], subcategoria: 'Vuelos' },
             'Salud y Bienestar': { palabras: ['OMINT', 'LEVEL GYM', 'FARMAEXPRESS', 'FARMACIA'], subcategoria: 'Farmacia' },
-            'Vivienda': { palabras: ['VANESA ELVIRA', 'DLO*ABRAZAS', 'CRISTINA GABRIELA AHUMADA'], subcategoria: 'Limpieza' },
+            'Vivienda': { palabras: ['VANESA ELVIRA', 'DLO*ABRAZAS', 'CRISTINA GABRIELA AHUMADA', 'ALDO JAVIER SANTILLAN'], subcategoria: 'Alquiler' },
             'Alimentos y Bebidas': { palabras: ['CARREFOUR', 'WALMART', 'GRANJA BENEDETTI', 'EL VECINO', 'LUIS HUMBERTO PIPISTRELLI', 'LUCAS MATIAS QUISPE'], subcategoria: 'Supermercado' },
-            'Vehículo': { palabras: ['SHELL', 'AXION', 'YPF', 'SHELLBOX', 'EST DE SERV BONANNO', 'SUR FRANCE', 'ALDO JAVIER SANTILLAN', 'RUMBO SUR'], subcategoria: 'YPF/Shell/Axion' },
+            'Vehículo': { palabras: ['SHELL', 'AXION', 'YPF', 'SHELLBOX', 'EST DE SERV BONANNO', 'SUR FRANCE', 'RUMBO SUR'], subcategoria: 'YPF/Shell/Axion' },
             'Compromisos': { palabras: ['PALOMA CARRETERO'], subcategoria: 'Cuota alimentaria' },
         };
 
@@ -723,6 +743,21 @@
             }
         }
 
+        function mostrarTablaIngresos() {
+            const tbody = document.querySelector('#tablaIngresos tbody');
+            tbody.innerHTML = '';
+            datosActuales.ingresos.forEach((ingreso, idx) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${ingreso.fecha}</td>
+                    <td>${ingreso.descripcion}</td>
+                    <td><span class="badge badge-${ingreso.tipo === 'Fijo' ? 'fijo' : 'variable'}">${ingreso.tipo}</span></td>
+                    <td>$${ingreso.monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                    <td><button onclick="datosActuales.ingresos.splice(${idx}, 1); sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaIngresos();" style="color: var(--danger); padding: 0.2rem 0.4rem; font-size: 11px;">✕ Eliminar</button></td>
+                `;
+            });
+        }
+
         function cargarDatos() {
             cargarTema();
             migrarDatos();
@@ -733,6 +768,7 @@
             cargarMes();
             poblarSelects();
             inicializarPresupuestos();
+            mostrarTablaIngresos();
         }
 
         function actualizarSelectMeses() {
@@ -1032,6 +1068,7 @@
             sinGuardar = true;
             mostrarEstadoPendiente();
             actualizarVistas();
+            mostrarTablaIngresos();
             document.getElementById('fechaCeramica').value = '';
             document.getElementById('montoCeramica').value = '';
         }
@@ -1044,6 +1081,30 @@
             sinGuardar = true;
             mostrarEstadoPendiente();
             actualizarVistas();
+            mostrarTablaIngresos();
+        }
+
+        function mostrarTablaIngresos() {
+            const tbody = document.querySelector('#tablaIngresos tbody');
+            tbody.innerHTML = '';
+            datosActuales.ingresos.forEach((ingreso, idx) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${ingreso.fecha}</td>
+                    <td>${ingreso.descripcion}</td>
+                    <td><span class="badge badge-${ingreso.tipo === 'Fijo' ? 'fijo' : 'variable'}">${ingreso.tipo}</span></td>
+                    <td>$${ingreso.monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                    <td><button onclick="datosActuales.ingresos.splice(${idx}, 1); sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaIngresos();" style="color: var(--danger); padding: 0.2rem 0.4rem; font-size: 11px;">✕</button></td>
+                `;
+            });
+        }
+
+        function eliminarIngreso(idx) {
+            datosActuales.ingresos.splice(idx, 1);
+            sinGuardar = true;
+            mostrarEstadoPendiente();
+            actualizarVistas();
+            mostrarTablaIngresos();
         }
 
         function agregarGastoEfectivo() {
@@ -1084,6 +1145,44 @@
             actualizarMetricas();
             actualizarUltimas();
             actualizarReportes();
+            mostrarResumenOrigen();
+        }
+
+        function mostrarResumenOrigen() {
+            const todos = [...datosActuales.mercadopago, ...datosActuales.tarjeta, ...datosActuales.efectivo];
+            const conEmpresa = todos.filter(g => !g.excluir);
+            
+            const gastosPorOrigen = {
+                'mercadopago': 0,
+                'tarjeta': 0,
+                'efectivo': 0
+            };
+            
+            conEmpresa.forEach(g => {
+                const monto = g.montoRegistrar || g.monto;
+                if (gastosPorOrigen.hasOwnProperty(g.origen)) {
+                    gastosPorOrigen[g.origen] += monto;
+                }
+            });
+            
+            let html = '';
+            const configs = {
+                'mercadopago': { label: '📱 Mercado Pago', color: '#185fa5' },
+                'tarjeta': { label: '💳 Tarjeta', color: '#639922' },
+                'efectivo': { label: '💸 Efectivo', color: '#ba7517' }
+            };
+            
+            for (const [origen, config] of Object.entries(configs)) {
+                const monto = gastosPorOrigen[origen] || 0;
+                html += `
+                    <div style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary)); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow);">
+                        <div style="font-size: 16px; margin-bottom: 0.5rem; font-weight: 600;">${config.label}</div>
+                        <div style="font-size: 22px; font-weight: 600; color: ${config.color};">$${monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('resumen-origen').innerHTML = html;
         }
 
         function actualizarMetricas() {
