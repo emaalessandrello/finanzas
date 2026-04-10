@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
+<!-- saved from url=(0057)file:///Users/emanuelalessandrello/Downloads/index_1.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finanzas Personal - V10.2</title>
     <style>
@@ -408,7 +408,7 @@
                 </div>
                 <div class="mes-dato">
                     <label>Meses guardados:</label>
-                    <select id="mesesGuardados" onchange="cargarMes()" style="max-width: 180px;"></select>
+                    <select id="mesesGuardados" onchange="cargarMes()" style="max-width: 180px;"><option value="">-- Cargar mes anterior --</option></select>
                 </div>
             </div>
             <div class="botones-accion">
@@ -423,13 +423,13 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="cambiarTab('dashboard')">📊 Dashboard</button>
-            <button class="tab" onclick="cambiarTab('ingresos')">💵 Ingresos</button>
-            <button class="tab" onclick="cambiarTab('mercado')">📱 Mercado Pago</button>
-            <button class="tab" onclick="cambiarTab('tarjeta')">💳 Tarjeta</button>
-            <button class="tab" onclick="cambiarTab('efectivo')">💸 Efectivo</button>
-            <button class="tab" onclick="cambiarTab('presupuestos')">🎯 Presupuestos</button>
-            <button class="tab" onclick="cambiarTab('reportes')">📈 Reportes</button>
+            <button class="tab active" onclick="cambiarTab(&#39;dashboard&#39;)">📊 Dashboard</button>
+            <button class="tab" onclick="cambiarTab(&#39;ingresos&#39;)">💵 Ingresos</button>
+            <button class="tab" onclick="cambiarTab(&#39;mercado&#39;)">📱 Mercado Pago</button>
+            <button class="tab" onclick="cambiarTab(&#39;tarjeta&#39;)">💳 Tarjeta</button>
+            <button class="tab" onclick="cambiarTab(&#39;efectivo&#39;)">💸 Efectivo</button>
+            <button class="tab" onclick="cambiarTab(&#39;presupuestos&#39;)">🎯 Presupuestos</button>
+            <button class="tab" onclick="cambiarTab(&#39;reportes&#39;)">📈 Reportes</button>
         </div>
 
         <!-- DASHBOARD -->
@@ -450,7 +450,7 @@
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Saldo</div>
-                    <div class="metric-value" id="saldoNeto">$0</div>
+                    <div class="metric-value" id="saldoNeto" style="color: var(--success);">$0</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Fijos</div>
@@ -462,7 +462,79 @@
                 </div>
             </div>
 
-            <div id="resumen-origen" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;"></div>
+            <div id="resumen-origen" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary)); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow);">
+                    <h3 style="font-size: 14px; color: var(--text-secondary); margin-bottom: 1rem; font-weight: 600;">📊 RESUMEN GASTOS POR ORIGEN</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 0.5rem;">📱 Mercado Pago</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #185fa5;">$0</div>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 0.5rem;">💳 Tarjeta Total</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #639922;">$0</div>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 0.5rem;">💸 Efectivo</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #ba7517;">$0</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="font-size: 14px; color: var(--text-secondary); margin-bottom: 0.5rem; margin-top: 1rem; font-weight: 600;">Desglose Tarjetas</h3>
+                    <div style="font-size: 12px; padding: 0.75rem; background: var(--bg-secondary); border-radius: 6px; margin-bottom: 1rem;">
+                        <div>💳 Tarjeta 5229: <strong style="color: #639922;">$0</strong></div>
+                        <div>💳 Tarjeta 8663: <strong style="color: #639922;">$0</strong></div>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, #639922, #4a7319); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow); color: white;">
+                    <h3 style="font-size: 14px; margin-bottom: 1rem; opacity: 0.9; font-weight: 600;">💰 POR COBRAR</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div style="font-size: 28px; font-weight: 600;">+$0</div>
+                        <div style="text-align: right; font-size: 12px; opacity: 0.9;">
+                            <div>Ingreso: $0</div>
+                            <div>- Adelantos: $0</div>
+                            <div>- Tarjeta: $0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Control de Adelantos</h2>
+                <div class="two-col">
+                    <div>
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="date" id="fechaAdelanto">
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <input type="text" id="descAdelanto" placeholder="ej: Retiro efectivo, Pago deuda, etc">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Monto ($)</label>
+                            <input type="number" id="montoAdelanto" step="0.01">
+                        </div>
+                        <button onclick="agregarAdelanto()" class="btn-warning">+ Agregar Adelanto</button>
+                    </div>
+                </div>
+                <div class="table-container" style="margin-top: 1rem;">
+                    <table id="tablaAdelantos">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Monto</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
 
             <div class="card">
                 <h2 style="font-size: 18px; margin-bottom: 1.5rem; color: var(--text-primary);">Últimas Transacciones</h2>
@@ -615,13 +687,13 @@
                         </div>
                         <div class="form-group">
                             <label>Categoría</label>
-                            <select id="categoriaEfectivo"></select>
+                            <select id="categoriaEfectivo"><option value="">Seleccionar...</option><option value="Pareja / Vuelos">Pareja / Vuelos</option><option value="Vivienda">Vivienda</option><option value="Servicios">Servicios</option><option value="Movilidad">Movilidad</option><option value="Combustible">Combustible</option><option value="Compromisos">Compromisos</option><option value="Salud y Bienestar">Salud y Bienestar</option><option value="Indumentaria">Indumentaria</option><option value="Seguridad">Seguridad</option><option value="Alimentos y Bebidas">Alimentos y Bebidas</option><option value="Comidas y Bebidas Afuera">Comidas y Bebidas Afuera</option><option value="Entretenimiento">Entretenimiento</option><option value="Vehículo">Vehículo</option><option value="Mascotas">Mascotas</option><option value="Regalos">Regalos</option><option value="Varios">Varios</option></select>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Subcategoría</label>
-                    <select id="subcategoriaEfectivo"></select>
+                    <select id="subcategoriaEfectivo"><option value="">Seleccionar...</option><option value="Pareja / Vuelos">Pareja / Vuelos</option><option value="Vivienda">Vivienda</option><option value="Servicios">Servicios</option><option value="Movilidad">Movilidad</option><option value="Combustible">Combustible</option><option value="Compromisos">Compromisos</option><option value="Salud y Bienestar">Salud y Bienestar</option><option value="Indumentaria">Indumentaria</option><option value="Seguridad">Seguridad</option><option value="Alimentos y Bebidas">Alimentos y Bebidas</option><option value="Comidas y Bebidas Afuera">Comidas y Bebidas Afuera</option><option value="Entretenimiento">Entretenimiento</option><option value="Vehículo">Vehículo</option><option value="Mascotas">Mascotas</option><option value="Regalos">Regalos</option><option value="Varios">Varios</option></select>
                 </div>
                 <button onclick="agregarGastoEfectivo()" class="btn-success">+ Agregar</button>
             </div>
@@ -631,7 +703,87 @@
         <div id="presupuestos" class="tab-content">
             <div class="card">
                 <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Presupuestos Mensuales</h2>
-                <div id="presupuestosForm"></div>
+                <div id="presupuestosForm"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Pareja / Vuelos</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Pareja / Vuelos&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Vivienda</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Vivienda&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Servicios</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Servicios&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Movilidad</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Movilidad&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Combustible</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Combustible&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Compromisos</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Compromisos&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Salud y Bienestar</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Salud y Bienestar&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Indumentaria</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Indumentaria&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Seguridad</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Seguridad&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Alimentos y Bebidas</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Alimentos y Bebidas&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Comidas y Bebidas Afuera</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Comidas y Bebidas Afuera&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Entretenimiento</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Entretenimiento&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Vehículo</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Vehículo&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Mascotas</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Mascotas&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Regalos</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Regalos&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="font-size: 13px;">Varios</label>
+                        <input type="number" value="0" step="100" placeholder="$0" onchange="datosActuales.presupuestos[&#39;Varios&#39;] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                    </div>
+                </div></div>
             </div>
         </div>
 
@@ -641,19 +793,19 @@
                 <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Filtros</h2>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                     <input type="month" id="filtroMes" onchange="actualizarReportes()" style="max-width: 150px;">
-                    <select id="filtroCategoria" onchange="actualizarReportes()" style="max-width: 150px;"></select>
+                    <select id="filtroCategoria" onchange="actualizarReportes()" style="max-width: 150px;"><option value="">Todas</option><option value="Pareja / Vuelos">Pareja / Vuelos</option><option value="Vivienda">Vivienda</option><option value="Servicios">Servicios</option><option value="Movilidad">Movilidad</option><option value="Combustible">Combustible</option><option value="Compromisos">Compromisos</option><option value="Salud y Bienestar">Salud y Bienestar</option><option value="Indumentaria">Indumentaria</option><option value="Seguridad">Seguridad</option><option value="Alimentos y Bebidas">Alimentos y Bebidas</option><option value="Comidas y Bebidas Afuera">Comidas y Bebidas Afuera</option><option value="Entretenimiento">Entretenimiento</option><option value="Vehículo">Vehículo</option><option value="Mascotas">Mascotas</option><option value="Regalos">Regalos</option><option value="Varios">Varios</option></select>
                     <input type="text" id="filtroBusqueda" placeholder="Buscar..." onchange="actualizarReportes()" style="max-width: 200px;">
                 </div>
             </div>
 
             <div class="card">
                 <h2 style="font-size: 16px; margin-bottom: 1.5rem;">Top 10 Gastos</h2>
-                <div id="topGastos"></div>
+                <div id="topGastos"><div style="padding: 1rem; text-align: center; color: var(--text-secondary);">Sin datos</div></div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <script src="./index_files/chart.umd.js"></script>
     <script>
         const VERSION = 'v10.2';
         const CATEGORIAS = ['Pareja / Vuelos', 'Vivienda', 'Servicios', 'Movilidad', 'Combustible', 'Compromisos', 'Salud y Bienestar', 'Indumentaria', 'Seguridad', 'Alimentos y Bebidas', 'Comidas y Bebidas Afuera', 'Entretenimiento', 'Vehículo', 'Mascotas', 'Regalos', 'Varios'];
@@ -728,7 +880,7 @@
         }
 
         function obtenerEstructuraDatos() {
-            return { mercadopago: [], tarjeta: [], efectivo: [], ingresos: [], presupuestos: {} };
+            return { mercadopago: [], tarjeta: [], efectivo: [], ingresos: [], adelantos: [], presupuestos: {} };
         }
 
         function migrarDatos() {
@@ -1148,39 +1300,96 @@
             mostrarResumenOrigen();
         }
 
+        function agregarAdelanto() {
+            const fecha = document.getElementById('fechaAdelanto').value;
+            const desc = document.getElementById('descAdelanto').value;
+            const monto = parseFloat(document.getElementById('montoAdelanto').value);
+            if (!fecha || !desc || !monto) { alert('Completa todos los campos'); return; }
+            
+            if (!datosActuales.adelantos) datosActuales.adelantos = [];
+            datosActuales.adelantos.push({ fecha, descripcion: desc, monto, fecha_creacion: new Date().toISOString() });
+            
+            sinGuardar = true;
+            mostrarEstadoPendiente();
+            actualizarVistas();
+            mostrarTablaAdelantos();
+            document.getElementById('fechaAdelanto').value = '';
+            document.getElementById('descAdelanto').value = '';
+            document.getElementById('montoAdelanto').value = '';
+        }
+
+        function mostrarTablaAdelantos() {
+            const tbody = document.querySelector('#tablaAdelantos tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            
+            if (!datosActuales.adelantos) datosActuales.adelantos = [];
+            datosActuales.adelantos.forEach((adelanto, idx) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${adelanto.fecha}</td>
+                    <td>${adelanto.descripcion}</td>
+                    <td>$${adelanto.monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                    <td><button onclick="datosActuales.adelantos.splice(${idx}, 1); sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaAdelantos();" style="color: var(--danger); padding: 0.2rem 0.4rem; font-size: 11px;">✕</button></td>
+                `;
+            });
+        }
+
         function mostrarResumenOrigen() {
             const todos = [...datosActuales.mercadopago, ...datosActuales.tarjeta, ...datosActuales.efectivo];
             const conEmpresa = todos.filter(g => !g.excluir);
             
+            // Separar por tarjeta específica
+            const tarjeta5229 = datosActuales.tarjeta.filter(g => !g.excluir && g.descripcion && g.descripcion.includes('5229')).reduce((s, g) => s + (g.montoRegistrar || g.monto), 0);
+            const tarjeta8663 = datosActuales.tarjeta.filter(g => !g.excluir && (!g.descripcion || !g.descripcion.includes('5229'))).reduce((s, g) => s + (g.montoRegistrar || g.monto), 0);
+            
             const gastosPorOrigen = {
-                'mercadopago': 0,
-                'tarjeta': 0,
-                'efectivo': 0
+                'mercadopago': datosActuales.mercadopago.filter(g => !g.excluir).reduce((s, g) => s + (g.montoRegistrar || g.monto), 0),
+                'tarjeta': datosActuales.tarjeta.filter(g => !g.excluir).reduce((s, g) => s + (g.montoRegistrar || g.monto), 0),
+                'efectivo': datosActuales.efectivo.filter(g => !g.excluir).reduce((s, g) => s + (g.montoRegistrar || g.monto), 0)
             };
             
-            conEmpresa.forEach(g => {
-                const monto = g.montoRegistrar || g.monto;
-                if (gastosPorOrigen.hasOwnProperty(g.origen)) {
-                    gastosPorOrigen[g.origen] += monto;
-                }
-            });
+            const totalIngresos = datosActuales.ingresos.reduce((s, g) => s + g.monto, 0);
+            const totalAdelantos = (datosActuales.adelantos || []).reduce((s, a) => s + a.monto, 0);
+            const porCobrar = totalIngresos - totalAdelantos - gastosPorOrigen.tarjeta;
             
-            let html = '';
-            const configs = {
-                'mercadopago': { label: '📱 Mercado Pago', color: '#185fa5' },
-                'tarjeta': { label: '💳 Tarjeta', color: '#639922' },
-                'efectivo': { label: '💸 Efectivo', color: '#ba7517' }
-            };
-            
-            for (const [origen, config] of Object.entries(configs)) {
-                const monto = gastosPorOrigen[origen] || 0;
-                html += `
-                    <div style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary)); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow);">
-                        <div style="font-size: 16px; margin-bottom: 0.5rem; font-weight: 600;">${config.label}</div>
-                        <div style="font-size: 22px; font-weight: 600; color: ${config.color};">$${monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+            let html = `
+                <div style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary)); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow);">
+                    <h3 style="font-size: 14px; color: var(--text-secondary); margin-bottom: 1rem; font-weight: 600;">📊 RESUMEN GASTOS POR ORIGEN</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 0.5rem;">📱 Mercado Pago</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #185fa5;">$${gastosPorOrigen.mercadopago.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 0.5rem;">💳 Tarjeta Total</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #639922;">$${gastosPorOrigen.tarjeta.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 0.5rem;">💸 Efectivo</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #ba7517;">$${gastosPorOrigen.efectivo.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+                        </div>
                     </div>
-                `;
-            }
+                    
+                    <h3 style="font-size: 14px; color: var(--text-secondary); margin-bottom: 0.5rem; margin-top: 1rem; font-weight: 600;">Desglose Tarjetas</h3>
+                    <div style="font-size: 12px; padding: 0.75rem; background: var(--bg-secondary); border-radius: 6px; margin-bottom: 1rem;">
+                        <div>💳 Tarjeta 5229: <strong style="color: #639922;">$${(tarjeta5229 || 0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</strong></div>
+                        <div>💳 Tarjeta 8663: <strong style="color: #639922;">$${(tarjeta8663 || 0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</strong></div>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, #639922, #4a7319); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow); color: white;">
+                    <h3 style="font-size: 14px; margin-bottom: 1rem; opacity: 0.9; font-weight: 600;">💰 POR COBRAR</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div style="font-size: 28px; font-weight: 600;">${porCobrar >= 0 ? '+' : ''}$${porCobrar.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+                        <div style="text-align: right; font-size: 12px; opacity: 0.9;">
+                            <div>Ingreso: $${totalIngresos.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+                            <div>- Adelantos: $${totalAdelantos.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+                            <div>- Tarjeta: $${gastosPorOrigen.tarjeta.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
             
             document.getElementById('resumen-origen').innerHTML = html;
         }
@@ -1269,9 +1478,11 @@
 
         document.getElementById('fechaEfectivo').valueAsDate = new Date();
         document.getElementById('fechaCeramica').valueAsDate = new Date();
+        document.getElementById('fechaAdelanto').valueAsDate = new Date();
         document.getElementById('mesWitralen').value = new Date().toISOString().split('T')[0].substring(0, 7);
         document.getElementById('filtroMes').value = mesActual;
         cargarDatos();
+        mostrarTablaAdelantos();
     </script>
-</body>
-</html>
+
+</body></html>
