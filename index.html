@@ -805,9 +805,35 @@
 
         function parsearMontoArgentino(montoStr) {
             if (!montoStr) return 0;
-            // Reemplaza punto por nada (separador de miles) y coma por punto (decimal)
-            const limpiar = montoStr.toString().trim().replace(/\./g, '').replace(',', '.');
-            return parseFloat(limpiar) || 0;
+            let str = montoStr.toString().trim().replace(/\$/g, '').replace(/\s/g, '');
+            
+            // Detectar formato:
+            // Formato 1 (Mercado Pago): 2.900,00 (puntos de miles, coma decimal)
+            // Formato 2 (Tarjeta USA): 46330.83 (punto decimal)
+            
+            // Si tiene coma, es formato argentino: 2.900,00
+            if (str.includes(',')) {
+                // Quitar puntos (miles) y reemplazar coma por punto
+                str = str.replace(/\./g, '').replace(',', '.');
+            }
+            // Si solo tiene punto sin coma, decidir por cantidad de dígitos
+            else if (str.includes('.')) {
+                // Contar dígitos después del punto
+                const partes = str.split('.');
+                const digitos_decimal = partes[partes.length - 1].length;
+                
+                if (digitos_decimal === 2) {
+                    // Es decimal: 46330.83
+                    // Ya está en formato correcto, no hacer nada
+                } else if (digitos_decimal > 2) {
+                    // Es separador de miles: 1.234.567.89 (raro pero posible)
+                    str = str.replace(/\./g, '');
+                } else {
+                    // Formato ambiguo, asumir que es decimal si tiene 1-2 dígitos
+                    // No hacer nada
+                }
+            }
+            return parseFloat(str) || 0;
         }
 
         function poblarSelects() {
@@ -855,7 +881,16 @@
                     if (monto >= 0 || isNaN(monto)) continue;
                     if (descripcion.includes('Rendimiento') || descripcion.includes('Transferencia recibida')) continue;
                     const montoAbs = Math.abs(monto);
-                    const clasificacion = clasificarGasto(descripcion);
+                    
+                    // AUTOMATIZAR EXCLUSIÓN
+                    const descUpper = descripcion.toUpperCase();
+                    let clasificacion;
+                    if (GASTOS_EXCLUIR.some(palabra => descUpper.includes(palabra))) {
+                        clasificacion = { categoria: 'EMPRESA', subcategoria: '', excluir: true };
+                    } else {
+                        clasificacion = clasificarGasto(descripcion);
+                    }
+                    
                     const division = DIVISIONES[descripcion.toUpperCase()] || 1;
                     const montoRegistrar = montoAbs / division;
                     gastosMP.push({
@@ -913,26 +948,53 @@
                 const csv = e.target.result;
                 const lineas = csv.split('\n');
                 let gastosTarjeta = [];
-                for (let i = 1; i < lineas.length; i++) {
+                
+                // Saltar primeras 2 líneas (título + header)
+                for (let i = 2; i < lineas.length; i++) {
                     const linea = lineas[i].trim();
                     if (!linea) continue;
                     const partes = linea.split(';');
                     if (partes.length < 9) continue;
-                    const fecha = partes[0].trim();
-                    const descripcion = partes[1].trim();
-                    const montoReg = parsearMontoArgentino(partes[3].trim());
-                    const categoria = partes[4].trim();
-                    const subcategoria = partes[5].trim();
-                    const tipo = partes[6].trim();
-                    const excluir = partes[8].trim() === 'SI';
-                    gastosTarjeta.push({ fecha, descripcion, monto: montoReg, montoRegistrar: montoReg, categoria, subcategoria, tipo, excluir, origen: 'tarjeta' });
+                    
+                    // Índices correctos del CSV
+                    const fecha = partes[0].trim();           // Fecha
+                    const descripcion = partes[1].trim();     // Descripcion
+                    const montoOrig = parsearMontoArgentino(partes[2].trim());  // Monto Original
+                    const montoReg = parsearMontoArgentino(partes[3].trim());   // Monto a Registrar
+                    let categoria = partes[4].trim();         // Categoria
+                    let subcategoria = partes[5].trim();      // Subcategoria
+                    let tipo = partes[6].trim();              // Tipo
+                    // partes[7] = Origen
+                    let excluir = partes[8].trim() === 'SI';  // Excluido
+                    
+                    // AUTOMATIZAR EXCLUSIÓN DE GASTOS EMPRESA
+                    const descUpper = descripcion.toUpperCase();
+                    if (GASTOS_EXCLUIR.some(palabra => descUpper.includes(palabra))) {
+                        excluir = true;
+                        categoria = 'EMPRESA';
+                        subcategoria = '';
+                        tipo = 'EMPRESA';
+                    }
+                    
+                    gastosTarjeta.push({ 
+                        fecha, 
+                        descripcion, 
+                        monto: montoOrig, 
+                        montoRegistrar: montoReg, 
+                        categoria, 
+                        subcategoria, 
+                        tipo, 
+                        excluir, 
+                        origen: 'tarjeta' 
+                    });
                 }
                 datosActuales.tarjeta = [...datosActuales.tarjeta, ...gastosTarjeta];
                 sinGuardar = true;
                 mostrarEstadoPendiente();
                 mostrarTablaTarjeta();
                 actualizarVistas();
-                document.getElementById('estadoTarjeta').innerHTML = `<div class="success">✓ ${gastosTarjeta.length} gastos cargados</div>`;
+                const excluidos = gastosTarjeta.filter(g => g.excluir).length;
+                document.getElementById('estadoTarjeta').innerHTML = `<div class="success">✓ ${gastosTarjeta.length} gastos cargados (${excluidos} empresa excluidos)</div>`;
             };
             reader.readAsText(archivo);
         }
