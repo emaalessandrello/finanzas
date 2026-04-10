@@ -3,56 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Finanzas Personales V10.1</title>
+    <title>Finanzas Personal - V10.2</title>
     <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #efefef;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border: #e0e0e0;
+            --success: #639922;
+            --warning: #ba7517;
+            --danger: #e34b4a;
+            --info: #185fa5;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        body.dark-mode {
+            --bg-primary: #1e1e1e;
+            --bg-secondary: #2a2a2a;
+            --bg-tertiary: #151515;
+            --text-primary: #e0e0e0;
+            --text-secondary: #999999;
+            --border: #404040;
+            --shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); background: var(--color-background-tertiary); color: var(--color-text-primary); }
-        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 1rem; }
-        .header h1 { font-size: 28px; font-weight: 500; }
-        .version-info { font-size: 12px; color: var(--color-text-secondary); }
-        .mes-selector { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 1rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md); flex-wrap: wrap; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem 1rem; }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2rem; 
+            flex-wrap: wrap; 
+            gap: 1rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .header h1 { 
+            font-size: 32px; 
+            font-weight: 600;
+            background: linear-gradient(135deg, #639922 0%, #185fa5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header-controls { display: flex; gap: 1rem; align-items: center; }
+        
+        .theme-toggle {
+            width: 50px;
+            height: 28px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+        }
+        
+        .theme-toggle.active {
+            background: var(--info);
+        }
+        
+        .theme-toggle span {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .theme-toggle.active span {
+            left: 24px;
+        }
+        
+        .mes-selector { 
+            display: flex; 
+            align-items: center; 
+            gap: 1.5rem; 
+            margin-bottom: 2rem; 
+            padding: 1.5rem; 
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+        }
+        
         .mes-info { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-        .mes-dato { display: flex; align-items: center; gap: 0.5rem; font-size: 14px; }
-        .mes-dato label { font-weight: 500; color: var(--color-text-secondary); }
-        .tabs { display: flex; gap: 0; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 2rem; overflow-x: auto; }
-        .tab { padding: 12px 16px; cursor: pointer; border: none; background: none; font-size: 14px; font-weight: 500; color: var(--color-text-secondary); border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
-        .tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); }
+        
+        .mes-dato { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+            font-size: 14px; 
+        }
+        
+        .mes-dato label { 
+            font-weight: 600; 
+            color: var(--text-secondary);
+            min-width: 50px;
+        }
+        
+        .tabs { 
+            display: flex; 
+            gap: 0; 
+            border-bottom: 2px solid var(--border); 
+            margin-bottom: 2rem; 
+            overflow-x: auto;
+            padding-bottom: 0;
+        }
+        
+        .tab { 
+            padding: 14px 20px; 
+            cursor: pointer; 
+            border: none; 
+            background: none; 
+            font-size: 14px; 
+            font-weight: 500; 
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab:hover { color: var(--text-primary); }
+        
+        .tab.active { 
+            color: var(--info);
+            border-bottom-color: var(--info);
+        }
+        
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .metric-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; text-align: center; }
-        .metric-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; margin-bottom: 0.5rem; }
-        .metric-value { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 0.5rem; color: var(--color-text-primary); }
-        input, select, textarea { width: 100%; padding: 0.75rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-family: inherit; font-size: 14px; background: var(--color-background-primary); color: var(--color-text-primary); }
-        input:focus, select:focus { outline: none; border-color: var(--color-border-primary); }
-        button { padding: 0.75rem 1.5rem; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-        button:hover { background: var(--color-background-secondary); }
-        .table-container { overflow-x: auto; max-height: 600px; overflow-y: auto; }
-        table { width: 100%; font-size: 12px; border-collapse: collapse; }
-        th { background: var(--color-background-secondary); padding: 0.75rem; text-align: left; font-weight: 500; border-bottom: 0.5px solid var(--color-border-tertiary); position: sticky; top: 0; }
-        td { padding: 0.75rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
-        tr:hover { background: var(--color-background-secondary); }
-        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: var(--border-radius-md); font-size: 10px; font-weight: 500; }
-        .badge-fijo { background: rgba(55, 138, 221, 0.15); color: #185FA5; }
-        .badge-variable { background: rgba(227, 75, 74, 0.15); color: #A32D2D; }
-        .chart-container { position: relative; width: 100%; height: 300px; margin: 1.5rem 0; }
-        .success { color: #639922; background: rgba(99, 153, 34, 0.1); padding: 1rem; border-radius: var(--border-radius-md); margin-bottom: 1rem; }
-        .info-box { background: rgba(55, 138, 221, 0.1); padding: 1rem; border-radius: var(--border-radius-md); margin-bottom: 1rem; color: var(--color-text-primary); font-size: 14px; }
-        .pending-items { background: rgba(186, 117, 23, 0.1); padding: 1rem; border-radius: var(--border-radius-md); margin-bottom: 1rem; border-left: 4px solid #BA7517; }
-        .botones-accion { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
-        .botones-accion button { padding: 0.75rem 1rem; }
-        .btn-success { background: #639922; color: white; font-weight: 600; border: none; }
-        .btn-success:hover { background: #4a7319; }
-        .btn-warning { background: rgba(186, 117, 23, 0.2); color: #854F0B; }
-        .btn-danger { background: rgba(227, 75, 74, 0.2); color: #A32D2D; }
-        .btn-info { background: rgba(55, 138, 221, 0.2); color: #185FA5; }
-        select.inline-select { width: auto; padding: 0.4rem; font-size: 11px; }
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .card { 
+            background: var(--bg-primary); 
+            border: 1px solid var(--border);
+            border-radius: 12px; 
+            padding: 2rem; 
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .metrics-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+            gap: 1.5rem; 
+            margin-bottom: 2rem; 
+        }
+        
+        .metric-card { 
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+            border: 1px solid var(--border);
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .metric-label { 
+            font-size: 11px; 
+            color: var(--text-secondary); 
+            text-transform: uppercase; 
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .metric-value { 
+            font-size: 24px; 
+            font-weight: 600; 
+            color: var(--text-primary);
+        }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        
+        label { 
+            display: block; 
+            font-size: 14px; 
+            font-weight: 600; 
+            margin-bottom: 0.5rem; 
+            color: var(--text-primary);
+        }
+        
+        input, select, textarea { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid var(--border);
+            border-radius: 8px; 
+            font-family: inherit; 
+            font-size: 14px; 
+            background: var(--bg-primary); 
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: var(--info);
+            box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.1);
+        }
+        
+        button { 
+            padding: 0.75rem 1.5rem; 
+            border: 1px solid var(--border);
+            background: var(--bg-secondary); 
+            color: var(--text-primary); 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 600; 
+            transition: all 0.3s;
+        }
+        
+        button:hover { 
+            background: var(--bg-tertiary);
+            transform: translateY(-2px);
+        }
+        
+        .table-container { 
+            overflow-x: auto; 
+            max-height: 600px; 
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        table { 
+            width: 100%; 
+            font-size: 13px; 
+            border-collapse: collapse; 
+        }
+        
+        th { 
+            background: var(--bg-secondary); 
+            padding: 1rem 0.75rem; 
+            text-align: left; 
+            font-weight: 600;
+            border-bottom: 1px solid var(--border); 
+            position: sticky; 
+            top: 0;
+            color: var(--text-secondary);
+        }
+        
+        td { 
+            padding: 1rem 0.75rem; 
+            border-bottom: 1px solid var(--border); 
+        }
+        
+        tr:hover { background: var(--bg-secondary); }
+        
+        .badge { 
+            display: inline-block; 
+            padding: 0.35rem 0.75rem; 
+            border-radius: 6px; 
+            font-size: 11px; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .badge-fijo { 
+            background: rgba(99, 153, 34, 0.15); 
+            color: var(--success);
+        }
+        
+        .badge-variable { 
+            background: rgba(227, 75, 74, 0.15); 
+            color: var(--danger);
+        }
+        
+        .success { 
+            color: var(--success); 
+            background: rgba(99, 153, 34, 0.1); 
+            padding: 1rem; 
+            border-radius: 8px; 
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--success);
+        }
+        
+        .info-box { 
+            background: rgba(24, 95, 165, 0.1); 
+            padding: 1rem; 
+            border-radius: 8px; 
+            margin-bottom: 1rem; 
+            color: var(--text-primary); 
+            font-size: 14px;
+            border-left: 4px solid var(--info);
+        }
+        
+        .pending-items { 
+            background: rgba(186, 117, 23, 0.1); 
+            padding: 1rem; 
+            border-radius: 8px; 
+            margin-bottom: 1rem; 
+            border-left: 4px solid var(--warning);
+        }
+        
+        .botones-accion { 
+            display: flex; 
+            gap: 1rem; 
+            margin-bottom: 1rem; 
+            flex-wrap: wrap;
+        }
+        
+        .botones-accion button { 
+            padding: 0.75rem 1rem;
+        }
+        
+        .btn-success { 
+            background: var(--success); 
+            color: white; 
+            border: none;
+        }
+        
+        .btn-success:hover { 
+            background: #4a7319;
+        }
+        
+        .btn-warning { 
+            background: rgba(186, 117, 23, 0.2); 
+            color: var(--warning);
+        }
+        
+        .btn-danger { 
+            background: rgba(227, 75, 74, 0.2); 
+            color: var(--danger);
+        }
+        
+        .btn-info { 
+            background: rgba(24, 95, 165, 0.2); 
+            color: var(--info);
+        }
+        
+        select.inline-select { 
+            width: auto; 
+            padding: 0.4rem; 
+            font-size: 11px;
+            max-width: 140px;
+        }
+        
+        .two-col { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) { 
+            .two-col { grid-template-columns: 1fr; }
+            .header h1 { font-size: 24px; }
+            .metrics-grid { grid-template-columns: 1fr; }
+            .mes-selector { flex-direction: column; align-items: flex-start; }
+        }
     </style>
 </head>
 <body>
@@ -60,11 +390,13 @@
         <div class="header">
             <div>
                 <h1>💰 Finanzas Personal</h1>
-                <span class="version-info">V10.1 - GitHub Pages</span>
             </div>
-            <div class="botones-accion">
+            <div class="header-controls">
                 <button class="btn-info" onclick="exportarHistoricoCSV()">📊 Histórico</button>
                 <button onclick="exportarMesActual()">⬇ Exportar</button>
+                <div class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
+                    <span id="themeIcon">🌙</span>
+                </div>
             </div>
         </div>
 
@@ -76,7 +408,7 @@
                 </div>
                 <div class="mes-dato">
                     <label>Meses guardados:</label>
-                    <select id="mesesGuardados" onchange="cargarMes()" style="max-width: 150px;"></select>
+                    <select id="mesesGuardados" onchange="cargarMes()" style="max-width: 180px;"></select>
                 </div>
             </div>
             <div class="botones-accion">
@@ -87,17 +419,17 @@
 
         <div id="pendientesMsg" class="pending-items" style="display: none;">
             <strong>⏳ CAMBIOS SIN GUARDAR</strong><br>
-            <button class="btn-success" onclick="guardarMes()">✓ GUARDAR AHORA</button>
+            <button class="btn-success" onclick="guardarMes()" style="margin-top: 0.5rem;">✓ GUARDAR AHORA</button>
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="cambiarTab('dashboard')">Dashboard</button>
-            <button class="tab" onclick="cambiarTab('ingresos')">Ingresos</button>
-            <button class="tab" onclick="cambiarTab('mercado')">Mercado Pago</button>
-            <button class="tab" onclick="cambiarTab('tarjeta')">Tarjeta</button>
-            <button class="tab" onclick="cambiarTab('efectivo')">Efectivo</button>
-            <button class="tab" onclick="cambiarTab('presupuestos')">Presupuestos</button>
-            <button class="tab" onclick="cambiarTab('reportes')">Reportes</button>
+            <button class="tab active" onclick="cambiarTab('dashboard')">📊 Dashboard</button>
+            <button class="tab" onclick="cambiarTab('ingresos')">💵 Ingresos</button>
+            <button class="tab" onclick="cambiarTab('mercado')">📱 Mercado Pago</button>
+            <button class="tab" onclick="cambiarTab('tarjeta')">💳 Tarjeta</button>
+            <button class="tab" onclick="cambiarTab('efectivo')">💸 Efectivo</button>
+            <button class="tab" onclick="cambiarTab('presupuestos')">🎯 Presupuestos</button>
+            <button class="tab" onclick="cambiarTab('reportes')">📈 Reportes</button>
         </div>
 
         <!-- DASHBOARD -->
@@ -110,11 +442,11 @@
             <div class="metrics-grid">
                 <div class="metric-card">
                     <div class="metric-label">Ingresos</div>
-                    <div class="metric-value" style="color: #639922;">$<span id="ingresoTotal">0</span></div>
+                    <div class="metric-value" style="color: var(--success);">$<span id="ingresoTotal">0</span></div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Gastos</div>
-                    <div class="metric-value" style="color: #A32D2D;">$<span id="gastoTotal">0</span></div>
+                    <div class="metric-value" style="color: var(--danger);">$<span id="gastoTotal">0</span></div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Saldo</div>
@@ -122,16 +454,16 @@
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Fijos</div>
-                    <div class="metric-value" style="color: #185FA5;">$<span id="gastoFijo">0</span></div>
+                    <div class="metric-value" style="color: var(--info);">$<span id="gastoFijo">0</span></div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Variables</div>
-                    <div class="metric-value" style="color: #A32D2D;">$<span id="gastoVariable">0</span></div>
+                    <div class="metric-value" style="color: var(--warning);">$<span id="gastoVariable">0</span></div>
                 </div>
             </div>
 
             <div class="card">
-                <h2 style="font-size: 16px; margin-bottom: 1rem;">Últimas Transacciones</h2>
+                <h2 style="font-size: 18px; margin-bottom: 1.5rem; color: var(--text-primary);">Últimas Transacciones</h2>
                 <div class="table-container">
                     <table id="ultimasTransacciones">
                         <thead>
@@ -153,10 +485,10 @@
         <!-- INGRESOS -->
         <div id="ingresos" class="tab-content">
             <div class="card">
-                <h2 style="font-size: 18px; margin-bottom: 1rem;">Registrar Ingresos</h2>
+                <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Registrar Ingresos</h2>
                 <div class="two-col">
                     <div>
-                        <h3 style="font-size: 14px; margin-bottom: 1rem;">WITRALEN</h3>
+                        <h3 style="font-size: 14px; margin-bottom: 1rem; color: var(--text-secondary);">WITRALEN</h3>
                         <div class="form-group">
                             <label>Mes</label>
                             <input type="month" id="mesWitralen">
@@ -165,10 +497,10 @@
                             <label>Monto ($)</label>
                             <input type="number" id="montoWitralen" value="3000000" step="100000">
                         </div>
-                        <button onclick="agregarIngresoWitralen()" style="background: #639922; color: white;">+ Agregar</button>
+                        <button onclick="agregarIngresoWitralen()" class="btn-success">+ Agregar</button>
                     </div>
                     <div>
-                        <h3 style="font-size: 14px; margin-bottom: 1rem;">CERÁMICA CONECTA</h3>
+                        <h3 style="font-size: 14px; margin-bottom: 1rem; color: var(--text-secondary);">CERÁMICA CONECTA</h3>
                         <div class="form-group">
                             <label>Fecha</label>
                             <input type="date" id="fechaCeramica">
@@ -177,7 +509,7 @@
                             <label>Monto ($)</label>
                             <input type="number" id="montoCeramica" step="1000">
                         </div>
-                        <button onclick="agregarIngresoCeramica()" style="background: #639922; color: white;">+ Agregar</button>
+                        <button onclick="agregarIngresoCeramica()" class="btn-success">+ Agregar</button>
                     </div>
                 </div>
             </div>
@@ -186,7 +518,7 @@
         <!-- MERCADO PAGO -->
         <div id="mercado" class="tab-content">
             <div class="card">
-                <h2 style="font-size: 18px; margin-bottom: 1rem;">Importar CSV Mercado Pago</h2>
+                <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Importar CSV Mercado Pago</h2>
                 <div class="info-box">📋 Sube CSV y edita categoría/subcategoría/tipo si necesitas</div>
                 <div class="form-group">
                     <label>Cargar archivo CSV</label>
@@ -215,7 +547,7 @@
         <!-- TARJETA -->
         <div id="tarjeta" class="tab-content">
             <div class="card">
-                <h2 style="font-size: 18px; margin-bottom: 1rem;">Importar CSV Tarjeta</h2>
+                <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Importar CSV Tarjeta</h2>
                 <div class="info-box">📋 Sube CSV y edita categoría/subcategoría/tipo si necesitas</div>
                 <div class="form-group">
                     <label>Cargar archivo CSV</label>
@@ -244,7 +576,7 @@
         <!-- EFECTIVO -->
         <div id="efectivo" class="tab-content">
             <div class="card">
-                <h2 style="font-size: 18px; margin-bottom: 1rem;">Agregar Gasto Efectivo</h2>
+                <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Agregar Gasto Efectivo</h2>
                 <div class="two-col">
                     <div>
                         <div class="form-group">
@@ -271,14 +603,14 @@
                     <label>Subcategoría</label>
                     <select id="subcategoriaEfectivo"></select>
                 </div>
-                <button onclick="agregarGastoEfectivo()" style="background: #639922; color: white;">+ Agregar</button>
+                <button onclick="agregarGastoEfectivo()" class="btn-success">+ Agregar</button>
             </div>
         </div>
 
         <!-- PRESUPUESTOS -->
         <div id="presupuestos" class="tab-content">
             <div class="card">
-                <h2 style="font-size: 18px; margin-bottom: 1rem;">Presupuestos Mensuales</h2>
+                <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Presupuestos Mensuales</h2>
                 <div id="presupuestosForm"></div>
             </div>
         </div>
@@ -286,7 +618,7 @@
         <!-- REPORTES -->
         <div id="reportes" class="tab-content">
             <div class="card">
-                <h2 style="font-size: 18px; margin-bottom: 1rem;">Filtros</h2>
+                <h2 style="font-size: 18px; margin-bottom: 1.5rem;">Filtros</h2>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                     <input type="month" id="filtroMes" onchange="actualizarReportes()" style="max-width: 150px;">
                     <select id="filtroCategoria" onchange="actualizarReportes()" style="max-width: 150px;"></select>
@@ -295,7 +627,7 @@
             </div>
 
             <div class="card">
-                <h2 style="font-size: 16px; margin-bottom: 1rem;">Top 10 Gastos</h2>
+                <h2 style="font-size: 16px; margin-bottom: 1.5rem;">Top 10 Gastos</h2>
                 <div id="topGastos"></div>
             </div>
         </div>
@@ -303,7 +635,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <script>
-        const VERSION = 'v10.1';
+        const VERSION = 'v10.2';
         const CATEGORIAS = ['Pareja / Vuelos', 'Vivienda', 'Servicios', 'Movilidad', 'Combustible', 'Compromisos', 'Salud y Bienestar', 'Indumentaria', 'Seguridad', 'Alimentos y Bebidas', 'Comidas y Bebidas Afuera', 'Entretenimiento', 'Vehículo', 'Mascotas', 'Regalos', 'Varios'];
 
         const SUBCATEGORIAS = {
@@ -349,15 +681,42 @@
         let datosActuales = {};
         let sinGuardar = false;
 
+        // TEMA CLARO/OSCURO
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const toggle = document.getElementById('themeToggle');
+            const icon = document.getElementById('themeIcon');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                toggle.classList.add('active');
+                icon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                toggle.classList.remove('active');
+                icon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        function cargarTema() {
+            const tema = localStorage.getItem('theme') || 'light';
+            if (tema === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeToggle').classList.add('active');
+                document.getElementById('themeIcon').textContent = '☀️';
+            }
+        }
+
         function obtenerEstructuraDatos() {
             return { mercadopago: [], tarjeta: [], efectivo: [], ingresos: [], presupuestos: {} };
         }
 
         function migrarDatos() {
-            const datosViejos = localStorage.getItem('finanzas_datos_v10') || localStorage.getItem('finanzas_datos_v9') || localStorage.getItem('finanzas_datos_v8');
+            const datosViejos = localStorage.getItem('finanzas_datos_v10.1') || localStorage.getItem('finanzas_datos_v10') || localStorage.getItem('finanzas_datos_v9') || localStorage.getItem('finanzas_datos_v8');
             if (datosViejos) {
                 datosGuardados = JSON.parse(datosViejos);
                 localStorage.setItem(`finanzas_datos_${VERSION}`, JSON.stringify(datosGuardados));
+                localStorage.removeItem('finanzas_datos_v10.1');
                 localStorage.removeItem('finanzas_datos_v10');
                 localStorage.removeItem('finanzas_datos_v9');
                 localStorage.removeItem('finanzas_datos_v8');
@@ -365,6 +724,7 @@
         }
 
         function cargarDatos() {
+            cargarTema();
             migrarDatos();
             const guardados = localStorage.getItem(`finanzas_datos_${VERSION}`);
             if (guardados) datosGuardados = JSON.parse(guardados);
@@ -445,6 +805,7 @@
 
         function parsearMontoArgentino(montoStr) {
             if (!montoStr) return 0;
+            // Reemplaza punto por nada (separador de miles) y coma por punto (decimal)
             const limpiar = montoStr.toString().trim().replace(/\./g, '').replace(',', '.');
             return parseFloat(limpiar) || 0;
         }
@@ -466,7 +827,7 @@
             const form = document.getElementById('presupuestosForm');
             form.innerHTML = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">' + 
                 CATEGORIAS.map(cat => `
-                    <div style="background: var(--color-background-secondary); padding: 1rem; border-radius: var(--border-radius-md);">
+                    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
                         <label style="font-size: 13px;">${cat}</label>
                         <input type="number" value="${datosActuales.presupuestos[cat] || 0}" step="100" placeholder="$0" 
                             onchange="datosActuales.presupuestos['${cat}'] = parseFloat(this.value); sinGuardar = true; mostrarEstadoPendiente();" 
@@ -539,7 +900,7 @@
                         <option ${gasto.tipo === 'Fijo' ? 'selected' : ''} value="Fijo">Fijo</option>
                         <option ${gasto.tipo === 'Variable' ? 'selected' : ''} value="Variable">Variable</option>
                     </select></td>
-                    <td><button onclick="datosActuales.mercadopago.splice(${idx}, 1); sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaMP();" style="color: #A32D2D; padding: 0.2rem 0.4rem; font-size: 11px;">✕</button></td>
+                    <td><button onclick="datosActuales.mercadopago.splice(${idx}, 1); sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaMP();" style="color: var(--danger); padding: 0.2rem 0.4rem; font-size: 11px;">✕</button></td>
                 `;
             });
         }
@@ -596,7 +957,7 @@
                         <option ${gasto.tipo === 'Fijo' ? 'selected' : ''} value="Fijo">Fijo</option>
                         <option ${gasto.tipo === 'Variable' ? 'selected' : ''} value="Variable">Variable</option>
                     </select></td>
-                    <td><button onclick="datosActuales.tarjeta.splice(${idx}, 1); sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaTarjeta();" style="color: #A32D2D; padding: 0.2rem 0.4rem; font-size: 11px;">✕</button></td>
+                    <td><button onclick="datosActuales.tarjeta.splice(${idx}, 1); sinGuardar = true; mostrarEstadoPendiente(); actualizarVistas(); mostrarTablaTarjeta();" style="color: var(--danger); padding: 0.2rem 0.4rem; font-size: 11px;">✕</button></td>
                 `;
             });
         }
@@ -674,7 +1035,7 @@
             document.getElementById('ingresoTotal').textContent = totalIngresos.toLocaleString('es-AR', {maximumFractionDigits: 0});
             document.getElementById('gastoTotal').textContent = totalGastos.toLocaleString('es-AR', {maximumFractionDigits: 0});
             document.getElementById('saldoNeto').textContent = '$' + saldoNeto.toLocaleString('es-AR', {maximumFractionDigits: 0});
-            document.getElementById('saldoNeto').style.color = saldoNeto >= 0 ? '#639922' : '#A32D2D';
+            document.getElementById('saldoNeto').style.color = saldoNeto >= 0 ? 'var(--success)' : 'var(--danger)';
             document.getElementById('gastoFijo').textContent = totalFijo.toLocaleString('es-AR', {maximumFractionDigits: 0});
             document.getElementById('gastoVariable').textContent = totalVariable.toLocaleString('es-AR', {maximumFractionDigits: 0});
         }
@@ -693,7 +1054,7 @@
                     <td>${t.categoria}</td>
                     <td>${t.subcategoria}</td>
                     <td>$${monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                    <td><span class="badge ${t.tipo === 'Fijo' ? 'badge-fijo' : 'badge-variable'}">${t.tipo}</span></td>
+                    <td><span class="badge badge-${t.tipo === 'Fijo' ? 'fijo' : 'variable'}">${t.tipo}</span></td>
                 `;
             });
         }
@@ -708,9 +1069,9 @@
             const topGastos = todos.sort((a, b) => (b.montoRegistrar || b.monto) - (a.montoRegistrar || a.monto)).slice(0, 10);
             const topHTML = topGastos.map(g => {
                 const monto = g.montoRegistrar || g.monto;
-                return `<div style="display: flex; justify-content: space-between; padding: 0.75rem; border-bottom: 0.5px solid var(--color-border-tertiary);"><div><div style="font-weight: 500; font-size: 12px;">${g.descripcion}</div><div style="font-size: 10px; color: var(--color-text-secondary);">${g.categoria} • ${g.subcategoria}</div></div><div style="font-weight: 500;">$${monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div></div>`;
+                return `<div style="display: flex; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border);"><div><div style="font-weight: 600; font-size: 13px;">${g.descripcion}</div><div style="font-size: 12px; color: var(--text-secondary);">${g.categoria} • ${g.subcategoria}</div></div><div style="font-weight: 600; color: var(--danger);">$${monto.toLocaleString('es-AR', {maximumFractionDigits: 0})}</div></div>`;
             }).join('');
-            document.getElementById('topGastos').innerHTML = topHTML;
+            document.getElementById('topGastos').innerHTML = topHTML || '<div style="padding: 1rem; text-align: center; color: var(--text-secondary);">Sin datos</div>';
         }
 
         function exportarMesActual() {
